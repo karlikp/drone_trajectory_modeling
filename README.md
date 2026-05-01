@@ -5,6 +5,18 @@ This project shows a simple model of drone movement in 3D space (3 DOF).
 It is part of the project:  
 **“Mechatronic module for water sampling with drone”**
 
+## Table of Contents
+- [Project Description](#project-description)
+- [Project Goal](#project-goal)
+- [Model](#model)
+- [Project Structure](#project-structure)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Run Simulation](#run-simulation)
+- [Output](#output)
+- [Simulation Scenario](#simulation-scenario)
+- [Notes](#notes)
+
 ## Project Description
 
 This project simulates how a drone moves in space.
