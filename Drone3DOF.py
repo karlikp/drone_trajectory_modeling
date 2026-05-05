@@ -3,9 +3,9 @@ import numpy as np
 
 class Drone3DOF:
     """
-    Uproszczony model ruchu drona w 3 DOF:
-    stan: x = [px, py, pz, vx, vy, vz]
-    wejście: u = [T, phi, theta, F_dist]
+    Simplified drone motion model in 3 DOF:
+    state: x = [px, py, pz, vx, vy, vz]
+    input: u = [T, phi, theta, F_dist]
     """
 
     def __init__(self, mass=2.5, kx=0.15, ky=0.15, kz=0.25, g=9.81):

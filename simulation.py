@@ -16,35 +16,34 @@ drone = Drone3DOF(
 
 def control_function(t):
     """
-    Funkcja odpowiada wymuszeniu układu.
+    Function defining system inputs (control + disturbances)
     """
 
     base_mass = 2.5
     water_mass = 0.5
 
-    # Masa wzrasta po pobraniu próbki wody
+    # Mass increases after water sampling
     if t < 5.0:
         mass = base_mass
     else:
         mass = base_mass + water_mass
 
-    # Ciąg obliczony dla początkowej masy
-    # Po wzroście masy będzie za mały, więc dron zacznie opadać
+    # Thrust computed for initial mass
     T = base_mass * drone.g
 
-    # wychylenie pitch - ruch w osi x [1-3s]
+    # pitch angle - motion along x axis [1–3 s]
     if 1.0 <= t <= 3.0:
         theta = np.deg2rad(5.0)
     else:
         theta = 0.0
 
-    # wychylenie roll - ruch w osi y [3-4s]
+    # roll angle - motion along y axis [3–4 s]
     if 3.0 <= t <= 4.0:
         phi = np.deg2rad(5.0)
     else:
         phi = 0.0
 
-    # zaklocenie pionowe (kontkat z woda)
+    # vertical disturbance (contact with water)
     if 6.0 <= t <= 6.5:
         F_dist = 2.0
     else:
@@ -53,7 +52,7 @@ def control_function(t):
     return T, phi, theta, F_dist, mass
 
 
-# warunki poczatkowe
+# initial conditions
 # state = [x, y, z, vx, vy, vz]
 initial_state = np.array([
     0.0,    # x [m]
@@ -65,42 +64,39 @@ initial_state = np.array([
 ])
 
 
-# czas symulacji
+# simulation time
 t_start = 0.0
 t_end = 10.0
 t_eval = np.linspace(t_start, t_end, 1000)
 
 
 
-# całkowanie równań ruchu drona
-# solve_ivp - funkcja do numerycznego rozwiązywania równań różniczkowych (ODE)
+# calkowanie rownan ruchu drona
+#solve_ivp - function for solving ordinary differential equations (ODE)
 solution = solve_ivp(
-    # fun: funkcja opisująca układ dynamiczny
-    # przyjmuje (t, x) i zwraca dx/dt
-    # czyli pochodne wektora stanu
+    # fun: function describing system dynamics
+    # takes (t, x) and returns dx/dt
+    # i.e. derivatives of the state vector
     fun=lambda t, x: drone.derivatives(t, x, control_function),
 
-    # t_span: przedział czasu symulacji (t_start, t_end)
-    # solver będzie liczył rozwiązanie od t_start do t_end
+  # t_span: simulation time interval (t_start, t_end)
     t_span=(t_start, t_end),
 
-    # y0: warunki początkowe układu
-    # wektor stanu w chwili t = t_start
+    # y0: initial state of the system
+    # state vector at t = t_start
     # [x, y, z, vx, vy, vz]
     y0=initial_state,
 
-    # t_eval: punkty czasowe, w których chcemy zapisać rozwiązanie
-    # solver może liczyć z adaptacyjnym krokiem,
-    # ale wynik zostanie zwrócony dokładnie w tych punktach
+    # t_eval: time points at which the solution is stored
     t_eval=t_eval,
 
-    # method: metoda numeryczna całkowania
-    # RK45 = Runge-Kutta 4/5 rzędu
+    # method: numerical integration method
+    # RK45 = Runge-Kutta 4/5 order
     method="RK45"
 )
 
 
-# odczyt wynikow
+# extract results
 t = solution.t
 x = solution.y[0]
 y = solution.y[1]
@@ -110,63 +106,63 @@ vy = solution.y[4]
 vz = solution.y[5]
 
 
-# wykres trajektorii 3D
+# 3D trajectory plot
 fig = plt.figure(figsize=(9, 6))
 ax = fig.add_subplot(111, projection="3d")
 
-ax.plot(x, y, z, label="Trajektoria lotu drona")
+ax.plot(x, y, z, label="Drone flight trajectory")
 
 ax.set_xlabel("x [m]")
 ax.set_ylabel("y [m]")
 ax.set_zlabel("z [m]")
-ax.set_title("Trajektoria lotu drona w modelu 3DOF")
+ax.set_title("Drone trajectory in 3DOF model")
 ax.legend()
 ax.grid(True)
 
-plt.savefig("trajektoria_3d.png", dpi=300)
+plt.savefig("trajectory_3d.png", dpi=300)
 
 
-# wykresy zmiennych stanu
+# state position plots
 plt.figure(figsize=(10, 6))
 plt.plot(t, x, label="x [m]")
 plt.plot(t, y, label="y [m]")
 plt.plot(t, z, label="z [m]")
-plt.axvline(5.0, linestyle="--", label="pobranie próbki")
-plt.axvline(6.0, linestyle=":", label="zakłócenie od rurki")
-plt.xlabel("Czas [s]")
-plt.ylabel("Położenie [m]")
-plt.title("Położenie drona w funkcji czasu")
+plt.axvline(5.0, linestyle="--", label="water sampling")
+plt.axvline(6.0, linestyle=":", label="tube disturbance")
+plt.xlabel("Time [s]")
+plt.ylabel("Position [m]")
+plt.title("Drone position in time function")
 plt.legend()
 plt.grid(True)
-plt.savefig("polozenie_czas.png", dpi=300)
+plt.savefig("position_time.png", dpi=300)
 
 
-# wykres predkosci
+# velocity plots
 plt.figure(figsize=(10, 6))
 plt.plot(t, vx, label="vx [m/s]")
 plt.plot(t, vy, label="vy [m/s]")
 plt.plot(t, vz, label="vz [m/s]")
-plt.xlabel("Czas [s]")
-plt.ylabel("Prędkość [m/s]")
-plt.title("Prędkości drona w funkcji czasu")
+plt.xlabel("Time [s]")
+plt.ylabel("Velocity [m/s]")
+plt.title("Drone velocity in time function")
 plt.legend()
 plt.grid(True)
-plt.savefig("predkosci_czas.png", dpi=300)
+plt.savefig("velocity_time.png", dpi=300)
 
 
-# portret fazowy dla osi z
+# phase portrait for z axis
 plt.figure(figsize=(8, 6))
 plt.plot(z, vz)
 plt.xlabel("z [m]")
 plt.ylabel("vz [m/s]")
-plt.title("Portret fazowy: wysokość z - prędkość vz")
+plt.title("Phase portrait: altitude z vs vertical velocity vz")
 plt.grid(True)
-plt.savefig("portret_fazowy_z.png", dpi=300)
+plt.savefig("phase_portrait_z.png", dpi=300)
 
 
-print("Symulacja zakończona.")
-print("Wygenerowano pliki:")
-print("- trajektoria_3d.png")
-print("- polozenie_czas.png")
-print("- predkosci_czas.png")
-print("- portret_fazowy_z.png")
+print("Simulation completed")
+print("Generated files:")
+print("- trajectory_3d.png")
+print("- position_time.png")
+print("- velocity_time.png")
+print("- phase_portrait_z.png")

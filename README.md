@@ -71,32 +71,35 @@ It is recommended to use a virtual environment.
 ## Installation
 
 ### 1. (Optional) Clone repository
-
-git clone <your-repo-url>  
+```bash
+git clone <https://github.com/karlikp/drone_trajectory_modeling.git>  
 cd drone_trajectory_modeling  
+```
 
 ### 2. Create virtual environment
-
+```bash
 python3 -m venv venv  
+```
 
 ### 3. Activate environment
 
 Linux / macOS:
-
+```bash
 source venv/bin/activate  
+```
 
 Windows:
-
+```bash
 venv\Scripts\activate  
-
+```
 ### 4. Install dependencies
-
+```bash
 pip install numpy scipy matplotlib  
-
+```
 ## Run Simulation
-
+```bash
 python3 simulation.py  
-
+```
 ## Output
 
 The program generates plots:
