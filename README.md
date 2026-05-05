@@ -92,6 +92,19 @@ Windows:
 ```bash
 venv\Scripts\activate  
 ```
+If you get the error: 
+```bash
+Scripts\Activate.ps1 cannot be loaded because running 
+scripts is disabled on this system.
+```
+Run:
+```bash
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+Then:
+```bash
+.\venv\Scripts\Activate.ps1
+```
 ### 4. Install dependencies
 ```bash
 pip install numpy scipy matplotlib  
